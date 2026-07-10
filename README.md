@@ -1,0 +1,146 @@
+# AI-Augmented Customer Support Operations Analytics
+
+This project evaluates how AI-assisted ticket classification can improve customer support triage operations. The focus is not simply building an LLM classifier, but quantifying where AI can safely support routing, how much manual triage time could be saved, and which recurring issues create the largest operational load.
+
+## Project Positioning
+
+The core business question:
+
+> Can AI-assisted classification improve customer support routing while keeping error risk transparent and measurable?
+
+This project is designed for Junior to Associate Data, Business, Product, and Operations Analyst roles. It combines Python analytics, LLM-assisted classification, validation metrics, and Power BI-ready outputs.
+
+## Data
+
+Planned dataset: **Multilingual Customer Support Tickets** from Kaggle.
+
+This project uses a synthetic but realistic customer support ticket dataset for demonstration purposes. Methodology and metrics are directly transferable to real production ticket data.
+
+Scope:
+
+- English tickets only
+- 300 to 500 representative tickets classified with Gemini API
+- Remaining data used for EDA and operational simulation using existing labels
+- LLM results validated against existing `category`, `priority`, and `department` labels where available
+
+Current local dataset check:
+
+- Downloaded with `kagglehub` from `tobiasbueck/multilingual-customer-support-tickets`
+- Latest downloaded archive path resolved to KaggleHub version folder `versions/14`
+- Selected v5-style source file: `aa_dataset-tickets-multi-lang-5-2-50-version.csv`
+- Detected source columns: `subject`, `body`, `answer`, `type`, `queue`, `priority`, `language`, `version`, `tag_1` to `tag_8`
+- Label mapping: `type` -> category, `queue` -> department/routing queue, `priority` -> priority
+- Starting rows: 28,587
+- English rows after language filter: 16,338
+- Final cleaned rows: 16,338
+- Classification sample: 500 stratified rows
+
+## Folder Structure
+
+```text
+data/
+  raw/            # original Kaggle CSV file
+  processed/      # cleaned data, sample data, predictions, metrics
+notebooks/        # optional exploratory notebooks
+outputs/
+  charts/         # confusion matrices and visuals
+  tables/         # Power BI-ready CSV tables
+sql/              # optional SQL queries for EDA checks
+src/
+  config.py
+  data_cleaning.py
+  evaluation.py
+  gemini_classification.py
+  powerbi_exports.py
+  sampling.py
+  schema.py
+  run_pipeline.py
+requirements.txt
+```
+
+## Phase 1: Core Analytics
+
+1. Clean the raw ticket dataset
+2. Filter to English-language tickets when a language column is available
+3. Analyze ticket category, department, and priority distributions
+4. Build a representative sample for Gemini classification
+5. Compare AI predictions with actual labels
+6. Calculate accuracy, precision, recall, F1, and confusion matrices
+7. Estimate before/after triage time and potential cost savings
+
+## Phase 2: AI Routing Design
+
+The routing design uses empirical accuracy, not raw LLM confidence, as the primary decision basis.
+
+- High-accuracy categories can be recommended for auto-routing
+- Lower-accuracy or ambiguous categories remain in human review
+- LLM self-reported confidence is retained only as a supporting diagnostic field
+
+This avoids overstating the reliability of model-generated confidence scores.
+
+## Phase 3: Root Cause and Recommendations
+
+Recurring issue analysis will be based on extracted root causes such as refund, login issue, password reset, delivery delay, billing error, and product defect.
+
+Recommendation principle:
+
+> If an issue accounts for X% of measured tickets, then self-service or FAQ improvements can be discussed as addressing up to that measured X% of ticket demand, before applying any separate adoption or deflection assumptions.
+
+All recommendation figures should be tied back to observed data.
+
+## How To Run
+
+1. Add the Kaggle CSV file to `data/raw/`.
+2. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Optional: download the Kaggle dataset with `kagglehub`:
+
+```bash
+python -m src.download_data
+```
+
+4. Clean and sample the data:
+
+```bash
+python -m src.run_pipeline --raw-file data/raw/your_file.csv --sample-size 500
+```
+
+5. Run Gemini classification:
+
+```bash
+set GEMINI_API_KEY=your_api_key
+python -m src.gemini_classification --input data/processed/classification_sample.csv
+```
+
+In PowerShell, use:
+
+```powershell
+$env:GEMINI_API_KEY="your_api_key"
+python -m src.gemini_classification --input data/processed/classification_sample.csv
+```
+
+6. Evaluate predictions and export Power BI tables:
+
+```bash
+python -m src.run_pipeline --evaluate-only
+```
+
+## Planned Power BI Outputs
+
+- Ticket volume by category, priority, and department
+- Classification accuracy by label type
+- Confusion matrix heatmaps
+- Automation threshold scenario table
+- Estimated triage time saved
+- Top recurring root causes
+
+## Methodology Notes
+
+- Gemini classification is validated on a representative sample, not the full dataset.
+- LLM confidence is treated as an auxiliary signal only.
+- Routing thresholds are based on empirical performance against known labels.
+- Cost and time savings are simulation estimates and should be shown separately from directly observed data.
