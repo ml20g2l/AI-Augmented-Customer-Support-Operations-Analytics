@@ -11,7 +11,13 @@ from dotenv import load_dotenv
 from google import genai
 from tqdm import tqdm
 
-from src.config import PROCESSED_DIR, TEXT_COLUMN, ensure_directories
+from src.config import (
+    FREE_TIER_MAX_REQUESTS,
+    FREE_TIER_MODEL,
+    PROCESSED_DIR,
+    TEXT_COLUMN,
+    ensure_directories,
+)
 
 
 PROMPT_TEMPLATE = """
@@ -58,11 +64,28 @@ def classify_ticket(client: genai.Client, model: str, ticket_text: str) -> dict:
     }
 
 
+def _validate_free_tier_settings(model: str, sample_size: int) -> None:
+    """Prevent accidental use of a paid model or an oversized free-tier run."""
+    if os.getenv("GEMINI_FREE_TIER_ONLY", "").strip().lower() != "true":
+        raise EnvironmentError(
+            "Set GEMINI_FREE_TIER_ONLY=true only after confirming that the API key belongs "
+            "to a Free Tier project in Google AI Studio."
+        )
+    if model != FREE_TIER_MODEL:
+        raise ValueError(
+            f"This project is restricted to the free-tier model {FREE_TIER_MODEL!r}."
+        )
+    if sample_size > FREE_TIER_MAX_REQUESTS:
+        raise ValueError(
+            f"Free-tier runs are capped at {FREE_TIER_MAX_REQUESTS} tickets; received {sample_size}."
+        )
+
+
 def classify_sample(
     input_file: str | Path = PROCESSED_DIR / "classification_sample.csv",
     output_file: str | Path = PROCESSED_DIR / "gemini_predictions.csv",
-    model: str = "gemini-2.0-flash",
-    sleep_seconds: float = 1.0,
+    model: str = FREE_TIER_MODEL,
+    sleep_seconds: float = 4.0,
 ) -> pd.DataFrame:
     ensure_directories()
     load_dotenv()
@@ -73,6 +96,7 @@ def classify_sample(
     sample = pd.read_csv(input_file)
     if TEXT_COLUMN not in sample.columns:
         raise ValueError(f"Input file must contain {TEXT_COLUMN!r}.")
+    _validate_free_tier_settings(model, len(sample))
 
     client = genai.Client(api_key=api_key)
     rows = []
@@ -103,8 +127,8 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", default=str(PROCESSED_DIR / "classification_sample.csv"))
     parser.add_argument("--output", default=str(PROCESSED_DIR / "gemini_predictions.csv"))
-    parser.add_argument("--model", default="gemini-2.0-flash")
-    parser.add_argument("--sleep-seconds", type=float, default=1.0)
+    parser.add_argument("--model", default=FREE_TIER_MODEL)
+    parser.add_argument("--sleep-seconds", type=float, default=4.0)
     args = parser.parse_args()
 
     classify_sample(args.input, args.output, args.model, args.sleep_seconds)

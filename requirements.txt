@@ -7,3 +7,5 @@ google-genai>=1.0.0
 kagglehub>=0.3.0
 python-dotenv>=1.0.0
 tqdm>=4.66.0
+jupyterlab>=4.2.0
+nbclient>=0.10.0

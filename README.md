@@ -19,7 +19,7 @@ This project uses a synthetic but realistic customer support ticket dataset for 
 Scope:
 
 - English tickets only
-- 300 to 500 representative tickets classified with Gemini API
+- Up to 500 representative tickets classified with the Gemini API free tier
 - Remaining data used for EDA and operational simulation using existing labels
 - LLM results validated against existing `category`, `priority`, and `department` labels where available
 
@@ -109,17 +109,21 @@ python -m src.download_data
 python -m src.run_pipeline --raw-file data/raw/your_file.csv --sample-size 500
 ```
 
-5. Run Gemini classification:
+5. Run Gemini classification using a Free Tier API key:
+
+Confirm in Google AI Studio that the API key belongs to a project marked **Free**. Do not link a billing account or select a paid-tier project for this portfolio project. The classifier accepts only `gemini-2.5-flash-lite`, requires an explicit free-tier acknowledgement, and caps each run at 500 tickets. It does not use grounding, batch processing, or other paid-only features.
 
 ```bash
-set GEMINI_API_KEY=your_api_key
+set GEMINI_API_KEY=your_free_tier_api_key
+set GEMINI_FREE_TIER_ONLY=true
 python -m src.gemini_classification --input data/processed/classification_sample.csv
 ```
 
 In PowerShell, use:
 
 ```powershell
-$env:GEMINI_API_KEY="your_api_key"
+$env:GEMINI_API_KEY="your_free_tier_api_key"
+$env:GEMINI_FREE_TIER_ONLY="true"
 python -m src.gemini_classification --input data/processed/classification_sample.csv
 ```
 
@@ -144,3 +148,4 @@ python -m src.run_pipeline --evaluate-only
 - LLM confidence is treated as an auxiliary signal only.
 - Routing thresholds are based on empirical performance against known labels.
 - Cost and time savings are simulation estimates and should be shown separately from directly observed data.
+- Gemini classification is restricted to the Google AI Studio Free Tier. The project is intentionally designed to stop at the free quota rather than continue on a paid tier.
