@@ -12,7 +12,7 @@ TABLES_DIR = OUTPUTS_DIR / "tables"
 
 DEFAULT_SAMPLE_SIZE = 500
 RANDOM_STATE = 42
-FREE_TIER_MODEL = "gemini-2.5-flash-lite"
+FREE_TIER_MODEL = "gemini-3.1-flash-lite"
 FREE_TIER_MAX_REQUESTS = 500
 
 TEXT_COLUMN = "ticket_text"

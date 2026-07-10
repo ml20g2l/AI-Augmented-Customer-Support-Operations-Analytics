@@ -111,7 +111,7 @@ python -m src.run_pipeline --raw-file data/raw/your_file.csv --sample-size 500
 
 5. Run Gemini classification using a Free Tier API key:
 
-Confirm in Google AI Studio that the API key belongs to a project marked **Free**. Do not link a billing account or select a paid-tier project for this portfolio project. The classifier accepts only `gemini-2.5-flash-lite`, requires an explicit free-tier acknowledgement, and caps each run at 500 tickets. It does not use grounding, batch processing, or other paid-only features.
+Confirm in Google AI Studio that the API key belongs to a project marked **Free**. Do not link a billing account or select a paid-tier project for this portfolio project. The classifier accepts only `gemini-3.1-flash-lite`, requires an explicit free-tier acknowledgement, and caps each run at 500 tickets. It does not use grounding, batch processing, or other paid-only features. Predictions are saved after each ticket so an interrupted run can resume without repeating already completed requests. If the Free Tier quota is exhausted, failed tickets are retried only when the free quota becomes available again; the project never switches to a paid tier.
 
 ```bash
 set GEMINI_API_KEY=your_free_tier_api_key
@@ -145,6 +145,7 @@ python -m src.run_pipeline --evaluate-only
 ## Methodology Notes
 
 - Gemini classification is validated on a representative sample, not the full dataset.
+- Gemini is given the observed category, priority, and routing label options, then must choose from those options exactly. This tests AI-assisted triage within the existing operating taxonomy rather than an unrelated open-ended taxonomy.
 - LLM confidence is treated as an auxiliary signal only.
 - Routing thresholds are based on empirical performance against known labels.
 - Cost and time savings are simulation estimates and should be shown separately from directly observed data.
