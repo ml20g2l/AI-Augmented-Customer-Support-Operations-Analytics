@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 
 from src.config import PROCESSED_DIR, TABLES_DIR, TRUE_LABELS, ensure_directories
+from src.efficiency_model import export_efficiency_scenarios
 from src.evaluation import empirical_accuracy_by_category
 
 
@@ -91,6 +92,7 @@ def export_root_cause_table(
 
 def export_all_powerbi_tables() -> None:
     export_distribution_tables()
+    export_efficiency_scenarios()
     predictions_file = PROCESSED_DIR / "gemini_predictions.csv"
     if predictions_file.exists():
         export_routing_scenarios(predictions_file)

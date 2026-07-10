@@ -68,6 +68,8 @@ requirements.txt
 6. Calculate accuracy, precision, recall, F1, and confusion matrices
 7. Estimate before/after triage time and potential cost savings
 
+The operational-efficiency table is available before LLM validation and is intentionally assumption-based. It shows the potential impact of 0%, 25%, 50%, and 75% AI-assisted triage coverage across all cleaned English tickets. These scenarios use a visible baseline of five manual triage minutes per ticket, one AI-assisted minute per ticket, and a GBP18 fully loaded hourly cost. They are not presented as observed savings.
+
 ## Phase 2: AI Routing Design
 
 The routing design uses empirical accuracy, not raw LLM confidence, as the primary decision basis.
