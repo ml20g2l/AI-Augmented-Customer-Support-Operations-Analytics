@@ -70,6 +70,17 @@ requirements.txt
 
 The operational-efficiency table is available before LLM validation and is intentionally assumption-based. It shows the potential impact of 0%, 25%, 50%, and 75% AI-assisted triage coverage across all cleaned English tickets. These scenarios use a visible baseline of five manual triage minutes per ticket, one AI-assisted minute per ticket, and a GBP18 fully loaded hourly cost. They are not presented as observed savings.
 
+## Project Progress
+
+| Phase | Workstream | Status | Evidence |
+| --- | --- | --- | --- |
+| Phase 1 | Data cleaning and English-only scope | Complete | 28,587 source rows to 16,338 cleaned English tickets; cleaning audit saved locally. |
+| Phase 1 | EDA and distribution analysis | Complete | Executed Jupyter notebook and Power BI-ready category, department, and priority tables. |
+| Phase 1 | Operational-efficiency simulation | Complete | Assumption-labelled time and cost scenarios across all cleaned tickets. |
+| Phase 1 | Gemini classification and validation | Pending Free Tier reset | The pipeline is ready to resume only failed tickets; no paid tier will be used. |
+| Phase 2 | Routing design and threshold comparison | Designed, pending validated sample | Power BI table structure and routing logic are ready once sufficient successful predictions exist. |
+| Phase 3 | Root-cause analysis and recommendations | Pending validated sample | Root-cause extraction and observed-share recommendations will follow successful classification. |
+
 ## Phase 2: AI Routing Design
 
 The routing design uses empirical accuracy, not raw LLM confidence, as the primary decision basis.

@@ -1,0 +1,20 @@
+Total Tickets =
+COUNTROWS('Tickets Cleaned')
+
+High-Priority Tickets =
+CALCULATE(
+    [Total Tickets],
+    'Tickets Cleaned'[actual_priority] = "high"
+)
+
+Technical Support Tickets =
+CALCULATE(
+    [Total Tickets],
+    'Tickets Cleaned'[actual_department] = "Technical Support"
+)
+
+Selected Scenario Hours Saved =
+MAX('Operational Efficiency Scenarios'[estimated_hours_saved])
+
+Selected Scenario Cost Saved GBP =
+MAX('Operational Efficiency Scenarios'[estimated_cost_saved_gbp])

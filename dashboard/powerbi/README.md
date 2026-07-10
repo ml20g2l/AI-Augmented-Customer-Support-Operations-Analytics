@@ -1,0 +1,63 @@
+# Power BI Dashboard Build Guide
+
+## Purpose
+
+Build a three-page operational dashboard. The first page is usable now because it relies only on cleaned tickets and transparent simulation assumptions. The later pages should remain unpublished until a valid Free Tier Gemini classification sample is available.
+
+## Data Sources
+
+Import the following local CSV files from the project folder.
+
+| Table | File | Use |
+| --- | --- | --- |
+| Tickets Cleaned | `data/processed/tickets_cleaned.csv` | Base ticket-level table for category, department, and priority analysis. |
+| Operational Efficiency Scenarios | `outputs/tables/operational_efficiency_scenarios.csv` | Assumption-based time and cost scenarios. |
+| Operational Efficiency Assumptions | `outputs/tables/operational_efficiency_assumptions.csv` | Visible model assumptions and caveats. |
+| Category Distribution | `outputs/tables/category_distribution.csv` | Optional pre-aggregated category chart. |
+| Department Distribution | `outputs/tables/department_distribution.csv` | Optional pre-aggregated department chart. |
+| Priority Distribution | `outputs/tables/priority_distribution.csv` | Optional pre-aggregated priority chart. |
+
+Do not import the current `gemini_predictions.csv` into the final report. It contains failed Free Tier requests and is not a valid validation sample.
+
+## Page 1: Operational Baseline
+
+Use this as the default page.
+
+1. Add three KPI cards: Total Tickets, High-Priority Tickets, and Technical Support Tickets.
+2. Add a horizontal bar chart for ticket volume by category.
+3. Add a horizontal bar chart for ticket volume by department.
+4. Add a column chart for ticket volume by priority.
+5. Add a line-and-column chart using Operational Efficiency Scenarios: AI-assisted rate on the x-axis, estimated hours saved as columns, and estimated cost saved as the line.
+6. Add the assumptions table at the bottom of the page. Title it `Simulation Assumptions`.
+
+Use concise subtitles that distinguish observed data from assumptions. For example: `Estimated from stated handling-time assumptions; not observed savings.`
+
+## Page 2: AI Validation and Routing
+
+Build this page only after at least 300 successful, label-constrained predictions are available.
+
+1. Add KPI cards for category, priority, and department accuracy.
+2. Add a category confusion matrix heatmap.
+3. Add a table of empirical category accuracy, ticket count, and routing recommendation.
+4. Add a what-if parameter called `Accuracy Threshold` from 50% to 95% in 5% increments.
+5. Add cards for automation rate, estimated auto-route errors, and estimated time saved.
+6. Use the threshold parameter to show auto-route only for categories whose empirical accuracy meets the selected threshold. All remaining categories should be labelled `Human review`.
+
+LLM confidence must not control routing. It may appear only as a diagnostic distribution or calibration comparison.
+
+## Page 3: Root Cause and Recommendations
+
+Build this page only after root-cause extraction is available for the valid prediction sample.
+
+1. Add a ranked bar chart for root-cause frequency.
+2. Add a matrix with root cause, ticket count, and ticket share.
+3. Add a recommendation text card driven by the selected root cause: `This issue accounts for X% of the measured sample. Self-service improvements could address up to that measured share before adoption and deflection assumptions are applied.`
+
+Do not state a ticket-reduction percentage beyond the observed root-cause share without a separate adoption assumption.
+
+## Visual Standards
+
+- Use a white canvas, charcoal text, teal for observed volumes, and amber for assumptions.
+- Use red only for error or human-review risk.
+- Keep global slicers limited to category, department, and priority.
+- Show data caveats in a small footer rather than in the KPI cards.
