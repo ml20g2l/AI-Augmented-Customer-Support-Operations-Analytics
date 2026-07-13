@@ -18,7 +18,7 @@
     .kpi { padding: 18px; }
     .kpi span { display: block; color: var(--muted); font-size: 12px; }
     .kpi strong { display: block; margin-top: 8px; font-size: 30px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
     .panel { padding: 18px; min-height: 255px; }
     h2 { margin: 0 0 16px; font-size: 16px; }
     .bar { display: grid; grid-template-columns: 130px 1fr 48px; align-items: center; gap: 10px; margin: 12px 0; color: var(--muted); }
@@ -30,7 +30,7 @@
     .scenario div { width: 80px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; }
     .column { width: 46px; background: var(--amber); }
     footer { margin-top: 12px; color: var(--muted); font-size: 12px; }
-    @media (max-width: 760px) { .kpis, .grid { grid-template-columns: 1fr; } .wide { grid-column: auto; } header { display: block; } .filters { margin-top: 14px; } }
+    @media (max-width: 900px) { .kpis, .grid { grid-template-columns: 1fr; } .wide { grid-column: auto; } header { display: block; } .filters { margin-top: 14px; } }
   </style>
 </head>
 <body>
@@ -46,6 +46,7 @@
     </section>
     <section class="grid">
       <article class="panel"><h2>Ticket volume by category</h2><div class="bar"><span>Incident</span><div class="track"><div class="fill" style="width:100%"></div></div><b>6,571</b></div><div class="bar"><span>Request</span><div class="track"><div class="fill" style="width:71%"></div></div><b>4,665</b></div><div class="bar"><span>Problem</span><div class="track"><div class="fill" style="width:52%"></div></div><b>3,397</b></div><div class="bar"><span>Change</span><div class="track"><div class="fill" style="width:26%"></div></div><b>1,705</b></div></article>
+      <article class="panel"><h2>Ticket volume by department</h2><div class="bar"><span>Technical Support</span><div class="track"><div class="fill" style="width:100%"></div></div><b>4,737</b></div><div class="bar"><span>Product Support</span><div class="track"><div class="fill" style="width:65%"></div></div><b>3,073</b></div><div class="bar"><span>Customer Service</span><div class="track"><div class="fill" style="width:51%"></div></div><b>2,410</b></div><div class="bar"><span>IT Support</span><div class="track"><div class="fill" style="width:41%"></div></div><b>1,942</b></div></article>
       <article class="panel"><h2>Ticket volume by priority</h2><div class="bar"><span>Medium</span><div class="track"><div class="fill" style="width:100%"></div></div><b>6,618</b></div><div class="bar"><span>High</span><div class="track"><div class="fill" style="width:96%"></div></div><b>6,346</b></div><div class="bar"><span>Low</span><div class="track"><div class="fill" style="width:51%"></div></div><b>3,374</b></div></article>
       <article class="panel wide"><h2>Estimated operational impact by AI-assisted triage coverage</h2><div class="scenario"><div><span class="column" style="height:0"></span><b>0%</b></div><div><span class="column" style="height:50px"></span><b>25%</b></div><div><span class="column" style="height:100px"></span><b>50%</b></div><div><span class="column" style="height:150px"></span><b>75%</b></div></div><p class="cost">50% scenario: 544.6 estimated hours saved | GBP 9,802.80 estimated cost saving</p></article>
     </section>
