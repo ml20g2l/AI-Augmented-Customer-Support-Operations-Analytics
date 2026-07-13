@@ -2,7 +2,7 @@
 
 ## Before You Start
 
-This guide builds Page 1 only: `Operational Baseline`. It uses observed ticket volumes and clearly labelled assumption-based efficiency scenarios. Do not use the current Gemini prediction file because the Free Tier quota interrupted the validation run.
+이 가이드는 Page 1 `Operational Baseline`부터 시작합니다. 관측된 티켓 수와 가정 기반 효율 시뮬레이션을 분리해 보여줍니다. 이후 Page 2와 Page 3에는 검증 완료된 Gemini Free Tier 300건 샘플의 집계표를 사용합니다.
 
 ### Files to Use
 
@@ -107,6 +107,22 @@ You do not need SQL to build this Power BI page.
 5. Select **File > Save**.
 6. Select **File > Export > PDF** and export one PDF page for your portfolio screenshot folder. Do not upload the `.pbix` file to GitHub because it is excluded by `.gitignore`.
 
-## Future Pages
+## Part 7: Add Page 2 - AI Validation and Routing
 
-Build `AI Validation and Routing` only after the Free Tier API pipeline returns at least 300 successful predictions. Build `Root Cause and Recommendations` only after valid root-cause data is available.
+1. **Home > Get data > Text/CSV**를 선택합니다.
+2. `outputs/tables/category_routing_recommendations.csv`와 `outputs/tables/routing_threshold_scenarios.csv`를 각각 불러옵니다.
+3. `category_routing_recommendations` 테이블에서 **Table** 시각화를 추가합니다. `category`, `ticket_count`, `empirical_accuracy`, `routing_recommendation`을 넣습니다.
+4. `routing_threshold_scenarios` 테이블에서 **Line and clustered column chart**를 추가합니다. X축은 `accuracy_threshold`, 열 값은 `automation_rate`, 선 값은 `minutes_saved_sample`으로 지정합니다.
+5. 같은 테이블로 **Card**를 세 개 추가해 `automated_tickets`, `estimated_auto_route_errors`, `estimated_cost_saved_sample`을 보여줍니다. 카드에는 각각 `Automated Tickets`, `Estimated Auto-route Errors`, `Estimated Cost Saved (Sample)` 제목을 붙입니다.
+6. 60% threshold 행을 선택했을 때 `Request`만 `Auto-route category`이고 나머지는 `Human review`인지 확인합니다. 이 정책은 category에만 적용됩니다. priority와 department는 자동 라우팅에 사용하지 않습니다.
+7. 텍스트 상자에 다음 문구를 추가합니다: `Routing decisions use observed category accuracy, not self-reported LLM confidence. Priority and department remain human-reviewed.`
+
+## Part 8: Add Page 3 - Root Cause and Recommendations
+
+1. **Home > Get data > Text/CSV**를 선택합니다.
+2. `outputs/tables/root_cause_normalised_distribution.csv`와 `outputs/tables/root_cause_recommendations.csv`를 불러옵니다.
+3. `root_cause_normalised_distribution` 테이블에서 **Clustered bar chart**를 추가합니다. Y축은 `root_cause_theme`, X축은 `ticket_count`, 제목은 `Top Recurring Issue Themes`로 지정합니다.
+4. `root_cause_recommendations` 테이블에서 **Table** 시각화를 추가합니다. `root_cause_theme`, `ticket_count`, `observed_sample_ticket_share`, `recommended_action`을 넣습니다.
+5. `observed_sample_ticket_share`는 Percentage 형식으로 바꿉니다. `maximum_addressable_share`도 표시한다면 같은 Percentage 형식을 적용합니다.
+6. 페이지 하단에 다음 문구를 추가합니다: `Observed shares describe the classified sample only. They are not ticket-deflection forecasts.`
+7. raw root cause가 아니라 반드시 정규화된 `root_cause_theme`을 사용합니다. 같은 의미의 서로 다른 표현을 별도 이슈로 세지 않기 위해서입니다.

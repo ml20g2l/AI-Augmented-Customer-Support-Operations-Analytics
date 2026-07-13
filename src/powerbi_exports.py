@@ -7,6 +7,7 @@ import pandas as pd
 from src.config import PROCESSED_DIR, TABLES_DIR, TRUE_LABELS, ensure_directories
 from src.efficiency_model import export_efficiency_scenarios
 from src.evaluation import empirical_accuracy_by_category
+from src.root_cause_analysis import export_root_cause_analysis
 
 
 def export_distribution_tables(cleaned_file: str | Path = PROCESSED_DIR / "tickets_cleaned.csv") -> None:
@@ -67,6 +68,33 @@ def export_routing_scenarios(
     return scenarios
 
 
+def export_category_routing_recommendations(
+    predictions_file: str | Path = PROCESSED_DIR / "gemini_predictions.csv",
+    decision_threshold: float = 0.60,
+    minimum_sample_tickets: int = 30,
+) -> pd.DataFrame:
+    """Export a conservative category-only routing policy from observed accuracy."""
+    ensure_directories()
+    accuracy = empirical_accuracy_by_category(predictions_file)
+    if accuracy.empty:
+        return accuracy
+
+    recommendations = accuracy.copy()
+    eligible = (
+        (recommendations["empirical_accuracy"] >= decision_threshold)
+        & (recommendations["ticket_count"] >= minimum_sample_tickets)
+    )
+    recommendations["routing_recommendation"] = eligible.map(
+        {True: "Auto-route category", False: "Human review"}
+    )
+    recommendations["decision_threshold"] = decision_threshold
+    recommendations["minimum_sample_tickets"] = minimum_sample_tickets
+    recommendations["routing_scope"] = "Category only; priority and department remain human-reviewed"
+    recommendations["decision_basis"] = "Empirical category accuracy against known labels"
+    recommendations.to_csv(TABLES_DIR / "category_routing_recommendations.csv", index=False)
+    return recommendations
+
+
 def export_root_cause_table(
     predictions_file: str | Path = PROCESSED_DIR / "gemini_predictions.csv",
 ) -> pd.DataFrame:
@@ -97,3 +125,5 @@ def export_all_powerbi_tables() -> None:
     if predictions_file.exists():
         export_routing_scenarios(predictions_file)
         export_root_cause_table(predictions_file)
+        export_category_routing_recommendations(predictions_file)
+        export_root_cause_analysis(predictions_file)

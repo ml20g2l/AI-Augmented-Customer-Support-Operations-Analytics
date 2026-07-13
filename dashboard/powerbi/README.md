@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Build a three-page operational dashboard. The first page is usable now because it relies only on cleaned tickets and transparent simulation assumptions. The later pages should remain unpublished until a valid Free Tier Gemini classification sample is available.
+Build a three-page operational dashboard. Page 1 uses cleaned tickets and transparent simulation assumptions. Pages 2 and 3 now use a validated 300-ticket Gemini Free Tier sample, with conservative routing and recommendation caveats retained in the visuals.
 
 ## Data Sources
 
@@ -16,8 +16,12 @@ Import the following local CSV files from the project folder.
 | Category Distribution | `outputs/tables/category_distribution.csv` | Optional pre-aggregated category chart. |
 | Department Distribution | `outputs/tables/department_distribution.csv` | Optional pre-aggregated department chart. |
 | Priority Distribution | `outputs/tables/priority_distribution.csv` | Optional pre-aggregated priority chart. |
+| Category Routing Recommendations | `outputs/tables/category_routing_recommendations.csv` | Empirical category accuracy and conservative routing decision. |
+| Routing Threshold Scenarios | `outputs/tables/routing_threshold_scenarios.csv` | Automation, estimated error, time, and cost trade-offs by threshold. |
+| Root Cause Themes | `outputs/tables/root_cause_normalised_distribution.csv` | Normalised recurring-issue themes from the classified sample. |
+| Root Cause Recommendations | `outputs/tables/root_cause_recommendations.csv` | Observed sample share and evidence-bounded actions. |
 
-Do not import the current `gemini_predictions.csv` into the final report. It contains failed Free Tier requests and is not a valid validation sample.
+The current `gemini_predictions.csv` contains 300 successful Free Tier classifications and can be imported for diagnostics. Use the prepared aggregate tables above for the final visuals.
 
 ## Page 1: Operational Baseline
 
@@ -34,7 +38,7 @@ Use concise subtitles that distinguish observed data from assumptions. For examp
 
 ## Page 2: AI Validation and Routing
 
-Build this page only after at least 300 successful, label-constrained predictions are available.
+The validated sample now contains 300 successful, label-constrained predictions.
 
 1. Add KPI cards for category, priority, and department accuracy.
 2. Add a category confusion matrix heatmap.
@@ -47,7 +51,7 @@ LLM confidence must not control routing. It may appear only as a diagnostic dist
 
 ## Page 3: Root Cause and Recommendations
 
-Build this page only after root-cause extraction is available for the valid prediction sample.
+Root-cause extraction is available for the valid classified sample. Use `Root Cause Themes` rather than raw model wording so synonymous issues are grouped consistently.
 
 1. Add a ranked bar chart for root-cause frequency.
 2. Add a matrix with root cause, ticket count, and ticket share.

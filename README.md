@@ -77,9 +77,9 @@ The operational-efficiency table is available before LLM validation and is inten
 | Phase 1 | Data cleaning and English-only scope | Complete | 28,587 source rows to 16,338 cleaned English tickets; cleaning audit saved locally. |
 | Phase 1 | EDA and distribution analysis | Complete | Executed Jupyter notebook and Power BI-ready category, department, and priority tables. |
 | Phase 1 | Operational-efficiency simulation | Complete | Assumption-labelled time and cost scenarios across all cleaned tickets. |
-| Phase 1 | Gemini classification and validation | Pending Free Tier reset | The pipeline is ready to resume only failed tickets; no paid tier will be used. |
-| Phase 2 | Routing design and threshold comparison | Designed, pending validated sample | Power BI table structure and routing logic are ready once sufficient successful predictions exist. |
-| Phase 3 | Root-cause analysis and recommendations | Pending validated sample | Root-cause extraction and observed-share recommendations will follow successful classification. |
+| Phase 1 | Gemini classification and validation | Complete | 300 successful Free Tier predictions validated against known labels: category accuracy 63.3%, priority accuracy 38.0%, department accuracy 27.7%. |
+| Phase 2 | Routing design and threshold comparison | Complete | Category-only routing policy uses empirical accuracy. At a conservative 60% threshold, Request is eligible for auto-routing; all other categories remain in human review. |
+| Phase 3 | Root-cause analysis and recommendations | Initial extraction complete | Raw root causes are grouped into transparent issue themes. Recommendation shares are limited to observed classified-sample shares; ticket-level review is the next validation step. |
 
 ## Phase 2: AI Routing Design
 
@@ -93,7 +93,7 @@ This avoids overstating the reliability of model-generated confidence scores.
 
 ## Phase 3: Root Cause and Recommendations
 
-Recurring issue analysis will be based on extracted root causes such as refund, login issue, password reset, delivery delay, billing error, and product defect.
+Recurring issue analysis is based on extracted root causes, then grouped using transparent keyword rules to avoid treating wording variants as separate operational issues.
 
 Recommendation principle:
 
@@ -163,3 +163,4 @@ python -m src.run_pipeline --evaluate-only
 - Routing thresholds are based on empirical performance against known labels.
 - Cost and time savings are simulation estimates and should be shown separately from directly observed data.
 - Gemini classification is restricted to the Google AI Studio Free Tier. The project is intentionally designed to stop at the free quota rather than continue on a paid tier.
+- The current validated Free Tier sample contains 300 successful classifications. Category predictions are materially stronger than priority and department predictions, so the operational policy permits only category-level auto-routing and retains priority and department review with a human.
