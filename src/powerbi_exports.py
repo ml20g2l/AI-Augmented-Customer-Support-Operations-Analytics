@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -8,6 +9,28 @@ from src.config import PROCESSED_DIR, TABLES_DIR, TRUE_LABELS, ensure_directorie
 from src.efficiency_model import export_efficiency_scenarios
 from src.evaluation import empirical_accuracy_by_category
 from src.root_cause_analysis import export_root_cause_analysis
+
+
+def export_validation_metric_summary() -> pd.DataFrame:
+    """Export headline validation metrics in a Power BI-friendly tabular shape."""
+    ensure_directories()
+    metrics_file = PROCESSED_DIR / "classification_metrics.json"
+    if not metrics_file.exists():
+        return pd.DataFrame()
+
+    metrics = json.loads(metrics_file.read_text(encoding="utf-8"))
+    rows = [
+        {
+            "label": label.title(),
+            "accuracy": result["accuracy"],
+            "sample_tickets": int(result["classification_report"]["macro avg"]["support"]),
+        }
+        for label, result in metrics.items()
+        if "accuracy" in result and "classification_report" in result
+    ]
+    summary = pd.DataFrame(rows)
+    summary.to_csv(TABLES_DIR / "validation_metric_summary.csv", index=False)
+    return summary
 
 
 def export_distribution_tables(cleaned_file: str | Path = PROCESSED_DIR / "tickets_cleaned.csv") -> None:
@@ -121,6 +144,7 @@ def export_root_cause_table(
 def export_all_powerbi_tables() -> None:
     export_distribution_tables()
     export_efficiency_scenarios()
+    export_validation_metric_summary()
     predictions_file = PROCESSED_DIR / "gemini_predictions.csv"
     if predictions_file.exists():
         export_routing_scenarios(predictions_file)

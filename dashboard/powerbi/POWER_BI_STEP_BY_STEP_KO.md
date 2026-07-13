@@ -109,20 +109,227 @@ You do not need SQL to build this Power BI page.
 
 ## Part 7: Add Page 2 - AI Validation and Routing
 
-1. **Home > Get data > Text/CSV**를 선택합니다.
-2. `outputs/tables/category_routing_recommendations.csv`와 `outputs/tables/routing_threshold_scenarios.csv`를 각각 불러옵니다.
-3. `category_routing_recommendations` 테이블에서 **Table** 시각화를 추가합니다. `category`, `ticket_count`, `empirical_accuracy`, `routing_recommendation`을 넣습니다.
-4. `routing_threshold_scenarios` 테이블에서 **Line and clustered column chart**를 추가합니다. X축은 `accuracy_threshold`, 열 값은 `automation_rate`, 선 값은 `minutes_saved_sample`으로 지정합니다.
-5. 같은 테이블로 **Card**를 세 개 추가해 `automated_tickets`, `estimated_auto_route_errors`, `estimated_cost_saved_sample`을 보여줍니다. 카드에는 각각 `Automated Tickets`, `Estimated Auto-route Errors`, `Estimated Cost Saved (Sample)` 제목을 붙입니다.
-6. 60% threshold 행을 선택했을 때 `Request`만 `Auto-route category`이고 나머지는 `Human review`인지 확인합니다. 이 정책은 category에만 적용됩니다. priority와 department는 자동 라우팅에 사용하지 않습니다.
-7. 텍스트 상자에 다음 문구를 추가합니다: `Routing decisions use observed category accuracy, not self-reported LLM confidence. Priority and department remain human-reviewed.`
+### 7.1 Import and Name the Files
+
+1. Select the **plus (+)** beside `Operational Baseline` to create a new page. Rename it `AI Validation and Routing`.
+2. Select **Home > Get data > Text/CSV** and import these files:
+   - `outputs/tables/validation_metric_summary.csv`
+   - `outputs/tables/category_routing_recommendations.csv`
+   - `outputs/tables/routing_threshold_scenarios.csv`
+   - `data/processed/confusion_matrix_category.csv`
+3. Rename the imported tables in the Data pane:
+   - `validation_metric_summary` to `Validation Metric Summary`
+   - `category_routing_recommendations` to `Category Routing Recommendations`
+   - `routing_threshold_scenarios` to `Routing Threshold Scenarios`
+   - `confusion_matrix_category` to `Category Confusion Matrix`
+4. For `Category Confusion Matrix`, select **Transform data** during import if the first column has no name. Rename that first column to `Actual Category`, then select **Close & Apply**.
+5. Use the Page format icon, set Canvas background to `#F8FAFC` at 0% transparency, and use white `#FFFFFF` for the wallpaper.
+
+### 7.2 Create the Page Header
+
+1. Add a text box in the top-left.
+2. Title: `AI Validation and Routing`.
+   - Font: Segoe UI Semibold
+   - Size: 26 pt
+   - Colour: `#1F2933`
+3. Subtitle: `Validated on a representative 300-ticket Gemini Free Tier sample`.
+   - Font: Segoe UI
+   - Size: 12 pt
+   - Colour: `#667085`
+4. Add a small text box on the top-right: `Category routing only; priority and department remain human-reviewed.`
+   - Font: Segoe UI
+   - Size: 10 pt
+   - Colour: `#667085`
+   - Background: `#FFFFFF`
+   - Border: `#E5E7EB`, 1 px
+   - Corner radius: 4 px
+
+### 7.3 Create the Accuracy KPI Cards
+
+1. In the `Tickets Cleaned` table, create the six Page 2 accuracy measures from `powerbi_measures.dax`: the three numeric accuracy measures and the three `Display` measures.
+2. Add three Card visuals in one row below the header:
+   - `Category Accuracy Display`; title `Category Accuracy`
+   - `Priority Accuracy Display`; title `Priority Accuracy`
+   - `Department Accuracy Display`; title `Department Accuracy`
+3. For each Card, use these exact settings:
+   - Card title: Segoe UI Semibold, 11 pt, colour `#667085`
+   - Callout value: Segoe UI Semibold, 28 pt, colour `#1F2933`
+   - Background: `#FFFFFF`, 0% transparency
+   - Border: On, `#E5E7EB`, 1 px
+   - Shadow: Off
+   - Corner radius: 4 px
+4. Verify the values before continuing: Category `63.3%`, Priority `38.0%`, Department `27.7%`.
+
+### 7.4 Add the Accuracy Comparison Chart
+
+1. Add a **Clustered bar chart** beneath the KPI cards on the left.
+2. Add fields:
+   - Y-axis: `label` from `Validation Metric Summary`
+   - X-axis: `accuracy`
+3. Rename fields for this visual:
+   - `label` to `Predicted Label`
+   - `accuracy` to `Observed Accuracy`
+4. Format:
+   - Title: `Observed Accuracy by Predicted Label`; Segoe UI Semibold, 14 pt, `#1F2933`
+   - Bars: `#1C8C88`
+   - Data labels: On, Segoe UI, 10 pt, `#344054`, Display units None, Decimal places 1
+   - X-axis: percentage, Start 0%, End 100%, Values Off
+   - Y-axis values: Segoe UI, 10 pt, `#667085`
+   - Background: transparent; Border: Off; Shadow: Off
+5. Tooltips: add `label`, `accuracy`, and `sample_tickets`. Rename them `Predicted Label`, `Observed Accuracy`, and `Validated Tickets`.
+
+### 7.5 Add the Category Routing Policy Table
+
+1. Add a **Table** visual to the right of the accuracy chart.
+2. Add fields in this order:
+   - `category`
+   - `ticket_count`
+   - `empirical_accuracy`
+   - `routing_recommendation`
+3. Rename for this visual: `Category`, `Validated Tickets`, `Empirical Accuracy`, and `Routing Decision`.
+4. Format:
+   - Title: `Conservative Category Routing Policy`; Segoe UI Semibold, 14 pt, `#1F2933`
+   - Column headers: Segoe UI Semibold, 10 pt, `#344054`, white background
+   - Values: Segoe UI, 10 pt, `#344054`
+   - `empirical_accuracy`: percentage, one decimal place
+   - Alternating rows: On, colour `#F8FAFC`
+   - Grid vertical lines: Off; horizontal lines: `#E5E7EB`
+   - Totals: Off
+   - Background: `#FFFFFF`; Border: `#E5E7EB`, 1 px; Corner radius: 4 px
+5. Apply conditional background colour to `Routing Decision`:
+   - `Auto-route category`: pale teal `#DDF3F1`
+   - `Human review`: pale amber `#FFF4D6`
+6. Tooltips: add `decision_basis`, `decision_threshold`, and `minimum_sample_tickets`. Rename them `Decision Basis`, `Accuracy Threshold`, and `Minimum Sample Tickets`.
+
+### 7.6 Add the Threshold Trade-off Chart
+
+1. Add a **Line and clustered column chart** across the bottom-left.
+2. Add fields:
+   - X-axis: `accuracy_threshold`
+   - Column y-axis: `automation_rate`
+   - Line y-axis: `estimated_auto_route_errors`
+3. Rename for this visual:
+   - `accuracy_threshold` to `Accuracy Threshold`
+   - `automation_rate` to `Automation Rate`
+   - `estimated_auto_route_errors` to `Estimated Auto-route Errors`
+4. Format:
+   - Title: `Automation Coverage and Estimated Error Risk by Threshold`; Segoe UI Semibold, 14 pt, `#1F2933`
+   - Column colour: amber `#E3A008`
+   - Line colour: dark charcoal `#344054`; width 3; markers Off
+   - X-axis: percentage, categorical, values 10 pt `#667085`
+   - Column Y-axis: percentage, Values Off
+   - Line Y-axis: Values Off
+   - Legend: On, Top centre, Segoe UI, 9 pt, `#667085`
+   - Background: `#FFFFFF`; Border: `#E5E7EB`, 1 px; Corner radius: 4 px; Shadow Off
+5. Tooltips: add `accuracy_threshold`, `automation_rate`, `automated_tickets`, `estimated_auto_route_errors`, `minutes_saved_sample`, and `estimated_cost_saved_sample`.
+6. Add a text box inside the lower part of the chart card: `At the 60% threshold, only Request qualifies for category-only auto-routing.`
+   - Font: Segoe UI, 9 pt, colour `#B54708`
+   - Background: `#FFF7E6`; Border: `#F4C36B`, 1 px; Corner radius: 4 px
+
+### 7.7 Add the Category Confusion Matrix
+
+1. Add a **Matrix** visual to the bottom-right.
+2. Add `Actual Category` to Rows. Add each predicted category column from `Category Confusion Matrix` to Values.
+3. Title: `Category Confusion Matrix`; Segoe UI Semibold, 14 pt, `#1F2933`.
+4. Apply Background colour conditional formatting to each predicted-category value:
+   - Minimum: `#FFFFFF`
+   - Maximum: `#B8E0DD`
+5. Use Segoe UI, 9 pt, `#344054` for headers and values. Turn Totals Off.
+6. Use a white background with a `#E5E7EB` 1 px border and 4 px corner radius.
+
+### 7.8 Add the Page 2 Caveat
+
+Add this text box at the bottom of the page:
+
+`Routing decisions use observed category accuracy, not self-reported LLM confidence. Priority and department remain human-reviewed.`
+
+- Font: Segoe UI, 10 pt, `#667085`
+- Background: transparent
+- Border: Off
 
 ## Part 8: Add Page 3 - Root Cause and Recommendations
 
-1. **Home > Get data > Text/CSV**를 선택합니다.
-2. `outputs/tables/root_cause_normalised_distribution.csv`와 `outputs/tables/root_cause_recommendations.csv`를 불러옵니다.
-3. `root_cause_normalised_distribution` 테이블에서 **Clustered bar chart**를 추가합니다. Y축은 `root_cause_theme`, X축은 `ticket_count`, 제목은 `Top Recurring Issue Themes`로 지정합니다.
-4. `root_cause_recommendations` 테이블에서 **Table** 시각화를 추가합니다. `root_cause_theme`, `ticket_count`, `observed_sample_ticket_share`, `recommended_action`을 넣습니다.
-5. `observed_sample_ticket_share`는 Percentage 형식으로 바꿉니다. `maximum_addressable_share`도 표시한다면 같은 Percentage 형식을 적용합니다.
-6. 페이지 하단에 다음 문구를 추가합니다: `Observed shares describe the classified sample only. They are not ticket-deflection forecasts.`
-7. raw root cause가 아니라 반드시 정규화된 `root_cause_theme`을 사용합니다. 같은 의미의 서로 다른 표현을 별도 이슈로 세지 않기 위해서입니다.
+### 8.1 Import and Prepare the Files
+
+1. Create a new page and rename it `Root Cause and Recommendations`.
+2. Select **Home > Get data > Text/CSV** and import:
+   - `outputs/tables/root_cause_normalised_distribution.csv`
+   - `outputs/tables/root_cause_recommendations.csv`
+3. Rename the tables:
+   - `root_cause_normalised_distribution` to `Root Cause Themes`
+   - `root_cause_recommendations` to `Root Cause Recommendations`
+4. Set Canvas background to `#F8FAFC` at 0% transparency. Keep the wallpaper white.
+5. In `Tickets Cleaned`, create the Page 3 measures from `powerbi_measures.dax`.
+
+### 8.2 Create the Page Header and KPI Cards
+
+1. Add the title `Root Cause and Recommendations`.
+   - Font: Segoe UI Semibold, 26 pt, `#1F2933`
+2. Add the subtitle `Recurring issue themes from the classified 300-ticket sample`.
+   - Font: Segoe UI, 12 pt, `#667085`
+3. Add three Card visuals below the header:
+   - `Classified Sample Tickets Display`; title `Classified Sample Tickets`
+   - `Largest Named Root Cause Share Display`; title `Largest Named Theme Share`
+   - `Unmapped Root Cause Share Display`; title `Unmapped Extracted Wording`
+4. Apply the same Card format as Page 2: title Segoe UI Semibold 11 pt `#667085`; callout Segoe UI Semibold 28 pt `#1F2933`; white background; `#E5E7EB` 1 px border; 4 px corner radius; shadow Off.
+5. The third card is a data-quality guardrail. Its title should remain visible; do not present it as a success metric.
+
+### 8.3 Add the Recurring-Issue Bar Chart
+
+1. Add a **Clustered bar chart** on the left under the KPI cards.
+2. Add fields:
+   - Y-axis: `root_cause_theme`
+   - X-axis: `ticket_count`
+3. In Filters on this visual, exclude `Other extracted issue` and `Unclassified root cause`. These are wording-quality buckets, not actionable issue themes.
+4. Sort by `ticket_count` descending.
+5. Format:
+   - Title: `Top Named Recurring Issue Themes`; Segoe UI Semibold, 14 pt, `#1F2933`
+   - Bar colour: teal `#1C8C88`
+   - Data labels: On, Segoe UI, 10 pt, `#344054`, Display units None, Decimal places 0
+   - X-axis values: Off
+   - Y-axis values: Segoe UI, 10 pt, `#667085`
+   - Background: `#FFFFFF`; Border: `#E5E7EB`, 1 px; Corner radius 4 px; Shadow Off
+6. Tooltips: add `root_cause_theme`, `ticket_count`, and `observed_sample_ticket_share`. Rename them `Issue Theme`, `Classified Tickets`, and `Observed Sample Share`.
+
+### 8.4 Add the Recommendation Table
+
+1. Add a **Table** visual to the right of the chart.
+2. Add fields in this order:
+   - `root_cause_theme`
+   - `ticket_count`
+   - `observed_sample_ticket_share`
+   - `recommended_action`
+3. Rename for this visual: `Issue Theme`, `Tickets`, `Observed Share`, `Recommended Action`.
+4. Exclude `Other extracted issue` and `Unclassified root cause` using the visual filter.
+5. Format:
+   - Title: `Evidence-Bounded Recommendations`; Segoe UI Semibold, 14 pt, `#1F2933`
+   - Header: Segoe UI Semibold, 10 pt, `#344054`, white background
+   - Values: Segoe UI, 10 pt, `#344054`; word wrap On for `Recommended Action`
+   - `Observed Share`: percentage, one decimal place
+   - Alternating rows: On, `#F8FAFC`
+   - Vertical grid lines: Off; horizontal lines: `#E5E7EB`; Totals: Off
+   - Background: `#FFFFFF`; Border: `#E5E7EB`, 1 px; Corner radius: 4 px; Shadow Off
+6. Tooltips: add `maximum_addressable_share` and `evidence_note`. Rename them `Maximum Addressable Share` and `Interpretation`.
+
+### 8.5 Add a Data-Quality and Recommendation Note
+
+1. Add a text box across the bottom of the page.
+2. Text:
+
+`Observed shares describe the classified sample only. They are not ticket-deflection forecasts. Recommendations describe where self-service work could address demand before adoption or deflection assumptions are applied.`
+
+3. Format:
+   - Font: Segoe UI, 10 pt, `#667085`
+   - Background: `#FFF7E6`
+   - Border: `#F4C36B`, 1 px
+   - Corner radius: 4 px
+   - Padding: 10 px
+4. Keep this note visible in the final PDF. It is an important methodology caveat, not decorative text.
+
+### 8.6 Final Quality Check for Pages 2 and 3
+
+1. Turn off visual-header icons for every chart and table: **Format visual > General > Header icons > Off**.
+2. Use only these colours: charcoal `#1F2933`, muted text `#667085`, teal `#1C8C88`, amber `#E3A008`, pale amber `#FFF7E6`, and border grey `#E5E7EB`.
+3. Do not use gradients, shadows, or rounded cards above 4 px.
+4. Confirm that all recommendation wording refers to the `classified sample`, not all tickets or a guaranteed ticket reduction.
+5. Save the `.pbix`, then export each page as PDF or PNG into `dashboard/screenshots/`. Keep the `.pbix` file out of GitHub.

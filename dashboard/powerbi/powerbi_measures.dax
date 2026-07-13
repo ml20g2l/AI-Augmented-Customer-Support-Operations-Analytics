@@ -18,3 +18,58 @@ MAX('Operational Efficiency Scenarios'[estimated_hours_saved])
 
 Selected Scenario Cost Saved GBP =
 MAX('Operational Efficiency Scenarios'[estimated_cost_saved_gbp])
+
+Category Accuracy =
+CALCULATE(
+    MAX('Validation Metric Summary'[accuracy]),
+    'Validation Metric Summary'[label] = "Category"
+)
+
+Priority Accuracy =
+CALCULATE(
+    MAX('Validation Metric Summary'[accuracy]),
+    'Validation Metric Summary'[label] = "Priority"
+)
+
+Department Accuracy =
+CALCULATE(
+    MAX('Validation Metric Summary'[accuracy]),
+    'Validation Metric Summary'[label] = "Department"
+)
+
+Category Accuracy Display =
+FORMAT([Category Accuracy], "0.0%")
+
+Priority Accuracy Display =
+FORMAT([Priority Accuracy], "0.0%")
+
+Department Accuracy Display =
+FORMAT([Department Accuracy], "0.0%")
+
+Classified Sample Tickets =
+SUM('Root Cause Themes'[ticket_count])
+
+Classified Sample Tickets Display =
+FORMAT([Classified Sample Tickets], "#,##0")
+
+Largest Named Root Cause Share =
+MAXX(
+    FILTER(
+        'Root Cause Themes',
+        'Root Cause Themes'[root_cause_theme] <> "Other extracted issue"
+            && 'Root Cause Themes'[root_cause_theme] <> "Unclassified root cause"
+    ),
+    'Root Cause Themes'[observed_sample_ticket_share]
+)
+
+Largest Named Root Cause Share Display =
+FORMAT([Largest Named Root Cause Share], "0.0%")
+
+Unmapped Root Cause Share =
+CALCULATE(
+    MAX('Root Cause Themes'[observed_sample_ticket_share]),
+    'Root Cause Themes'[root_cause_theme] = "Other extracted issue"
+)
+
+Unmapped Root Cause Share Display =
+FORMAT([Unmapped Root Cause Share], "0.0%")

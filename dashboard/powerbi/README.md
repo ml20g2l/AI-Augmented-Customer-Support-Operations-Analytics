@@ -16,6 +16,7 @@ Import the following local CSV files from the project folder.
 | Category Distribution | `outputs/tables/category_distribution.csv` | Optional pre-aggregated category chart. |
 | Department Distribution | `outputs/tables/department_distribution.csv` | Optional pre-aggregated department chart. |
 | Priority Distribution | `outputs/tables/priority_distribution.csv` | Optional pre-aggregated priority chart. |
+| Validation Metric Summary | `outputs/tables/validation_metric_summary.csv` | Headline accuracy and sample-size metrics by predicted label. |
 | Category Routing Recommendations | `outputs/tables/category_routing_recommendations.csv` | Empirical category accuracy and conservative routing decision. |
 | Routing Threshold Scenarios | `outputs/tables/routing_threshold_scenarios.csv` | Automation, estimated error, time, and cost trade-offs by threshold. |
 | Root Cause Themes | `outputs/tables/root_cause_normalised_distribution.csv` | Normalised recurring-issue themes from the classified sample. |
