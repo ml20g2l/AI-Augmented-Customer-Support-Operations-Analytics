@@ -66,3 +66,12 @@ Do not state a ticket-reduction percentage beyond the observed root-cause share 
 - Use red only for error or human-review risk.
 - Keep global slicers limited to category, department, and priority.
 - Show data caveats in a small footer rather than in the KPI cards.
+
+## Design Mock-ups
+
+Use these local reference images while building the remaining Power BI pages:
+
+- `ai_validation_routing_mockup.png` for Page 2: AI Validation and Routing
+- `root_cause_recommendations_mockup.png` for Page 3: Root Cause and Recommendations
+
+The mock-ups use the measured 300-ticket validation results and are layout references, not exported Power BI screenshots.
