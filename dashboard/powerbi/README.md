@@ -67,11 +67,12 @@ Do not state a ticket-reduction percentage beyond the observed root-cause share 
 - Keep global slicers limited to category, department, and priority.
 - Show data caveats in a small footer rather than in the KPI cards.
 
-## Design Mock-ups
+## Dashboard Screenshots
 
-Use these local reference images while building the remaining Power BI pages:
+The final Power BI dashboard screenshots are stored alongside this guide:
 
-- `ai_validation_routing_mockup.png` for Page 2: AI Validation and Routing
-- `root_cause_recommendations_mockup.png` for Page 3: Root Cause and Recommendations
+- `operational-baseline.png`: Page 1, Operational Baseline
+- `ai-validation-and-routing.png`: Page 2, AI Validation and Routing
+- `root-cause-and-recommendations.png`: Page 3, Root Cause and Recommendations
 
-The mock-ups use the measured 300-ticket validation results and are layout references, not exported Power BI screenshots.
+The `.pbix` source file remains local and is intentionally excluded from GitHub.
