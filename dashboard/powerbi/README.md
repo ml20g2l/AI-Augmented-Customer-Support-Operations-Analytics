@@ -1,5 +1,7 @@
 # Power BI Dashboard Build Guide
 
+For project findings, methodology, and final dashboard screenshots, see the [project README](../../README.md).
+
 ## Purpose
 
 Build a three-page operational dashboard. Page 1 uses cleaned tickets and transparent simulation assumptions. Pages 2 and 3 now use a validated 300-ticket Gemini Free Tier sample, with conservative routing and recommendation caveats retained in the visuals.

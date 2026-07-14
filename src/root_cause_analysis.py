@@ -67,6 +67,21 @@ def export_root_cause_analysis(
     )
     distribution.to_csv(TABLES_DIR / "root_cause_normalised_distribution.csv", index=False)
 
+    total_tickets = int(themes.size)
+    unmapped_tickets = int((themes == "Other extracted issue").sum())
+    unclassified_tickets = int((themes == "Unclassified root cause").sum())
+    mapping_audit = pd.DataFrame([
+        {
+            "total_classified_tickets": total_tickets,
+            "named_theme_tickets": total_tickets - unmapped_tickets - unclassified_tickets,
+            "named_theme_coverage": (total_tickets - unmapped_tickets - unclassified_tickets) / total_tickets,
+            "unmapped_extracted_wording_tickets": unmapped_tickets,
+            "unmapped_extracted_wording_share": unmapped_tickets / total_tickets,
+            "unclassified_root_cause_tickets": unclassified_tickets,
+        }
+    ])
+    mapping_audit.to_csv(TABLES_DIR / "root_cause_mapping_audit.csv", index=False)
+
     recommendations = distribution.copy()
     recommendations["recommended_action"] = recommendations["root_cause_theme"].map(_recommendation_for)
     recommendations["maximum_addressable_share"] = recommendations["observed_sample_ticket_share"]

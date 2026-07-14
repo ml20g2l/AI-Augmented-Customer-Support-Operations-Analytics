@@ -1,166 +1,103 @@
 # AI-Augmented Customer Support Operations Analytics
 
-This project evaluates how AI-assisted ticket classification can improve customer support triage operations. The focus is not simply building an LLM classifier, but quantifying where AI can safely support routing, how much manual triage time could be saved, and which recurring issues create the largest operational load.
+An operations analytics project that evaluates where AI-assisted customer-support triage can be used safely, where human review must remain, and which recurring issue themes offer the clearest self-service opportunities.
 
-## Project Positioning
+## Executive Summary
 
-The core business question:
+Using a synthetic but realistic multilingual customer-support dataset, this project cleaned 28,587 source tickets into 16,338 English tickets, then validated Gemini API classifications against known operational labels on a representative 300-ticket sample.
 
-> Can AI-assisted classification improve customer support routing while keeping error risk transparent and measurable?
+The result is deliberately conservative: category prediction was useful enough for a limited category-only routing policy, while priority and department prediction were not reliable enough for automation. The dashboard keeps observed results, simulation assumptions, and root-cause caveats separate.
 
-This project is designed for Junior to Associate Data, Business, Product, and Operations Analyst roles. It combines Python analytics, LLM-assisted classification, validation metrics, and Power BI-ready outputs.
+## Dashboard
 
-## Data
+### Page 1: Operational Baseline
 
-Planned dataset: **Multilingual Customer Support Tickets** from Kaggle.
+![Operational Baseline](dashboard/powerbi/operational-baseline.png)
 
-This project uses a synthetic but realistic customer support ticket dataset for demonstration purposes. Methodology and metrics are directly transferable to real production ticket data.
+### Page 2: AI Validation and Routing
 
-Scope:
+![AI Validation and Routing](dashboard/powerbi/ai-validation-and-routing.png)
 
-- English tickets only
-- Up to 500 representative tickets classified with the Gemini API free tier
-- Remaining data used for EDA and operational simulation using existing labels
-- LLM results validated against existing `category`, `priority`, and `department` labels where available
+### Page 3: Root Cause and Recommendations
 
-Current local dataset check:
+![Root Cause and Recommendations](dashboard/powerbi/root-cause-and-recommendations.png)
 
-- Downloaded with `kagglehub` from `tobiasbueck/multilingual-customer-support-tickets`
-- Latest downloaded archive path resolved to KaggleHub version folder `versions/14`
-- Selected v5-style source file: `aa_dataset-tickets-multi-lang-5-2-50-version.csv`
-- Detected source columns: `subject`, `body`, `answer`, `type`, `queue`, `priority`, `language`, `version`, `tag_1` to `tag_8`
-- Label mapping: `type` -> category, `queue` -> department/routing queue, `priority` -> priority
-- Starting rows: 28,587
-- English rows after language filter: 16,338
-- Final cleaned rows: 16,338
-- Classification sample: 500 stratified rows
+## Key Findings
 
-## Folder Structure
+- **Operational baseline:** 16,338 cleaned English tickets; 6,346 were high priority and Technical Support was the largest queue with 4,737 tickets.
+- **Validated AI performance:** category accuracy was **63.3%**, compared with **38.0%** for priority and **27.7%** for department.
+- **Conservative routing policy:** at a 60% empirical-accuracy threshold, only the **Request** category qualified for category-only auto-routing. It represented 89 of 300 validated tickets and had 100.0% observed category accuracy in this sample. Priority and department remain human-reviewed.
+- **Illustrative efficiency scenario:** at 50% AI-assisted triage coverage, the stated handling-time assumptions indicate **544.6 hours** and **GBP 9,802.80** in potential savings across the cleaned English dataset. These are simulation estimates, not observed savings.
+- **Recurring issue themes:** Integration support was the largest named theme at **22.0%** of the classified sample, followed by Information request at **15.3%**.
 
-```text
-data/
-  raw/            # original Kaggle CSV file
-  processed/      # cleaned data, sample data, predictions, metrics
-notebooks/        # optional exploratory notebooks
-outputs/
-  charts/         # confusion matrices and visuals
-  tables/         # Power BI-ready CSV tables
-sql/              # optional SQL queries for EDA checks
-src/
-  config.py
-  data_cleaning.py
-  evaluation.py
-  gemini_classification.py
-  powerbi_exports.py
-  sampling.py
-  schema.py
-  run_pipeline.py
-requirements.txt
-```
+## Root-Cause Mapping Quality
 
-## Phase 1: Core Analytics
+LLM-extracted root causes were converted to named themes using deterministic keyword rules. Of 300 classified tickets, 209 (69.7%) were assigned to a named theme. The remaining 91 tickets (30.3%) are retained as `Other extracted issue` rather than forced into an unsuitable category.
 
-1. Clean the raw ticket dataset
-2. Filter to English-language tickets when a language column is available
-3. Analyze ticket category, department, and priority distributions
-4. Build a representative sample for Gemini classification
-5. Compare AI predictions with actual labels
-6. Calculate accuracy, precision, recall, F1, and confusion matrices
-7. Estimate before/after triage time and potential cost savings
+This is an intentional data-quality guardrail: named themes inform exploratory self-service opportunities, while the unmapped share makes the taxonomy limitation visible. See the [root-cause mapping audit](reports/ROOT_CAUSE_MAPPING_AUDIT.md).
 
-The operational-efficiency table is available before LLM validation and is intentionally assumption-based. It shows the potential impact of 0%, 25%, 50%, and 75% AI-assisted triage coverage across all cleaned English tickets. These scenarios use a visible baseline of five manual triage minutes per ticket, one AI-assisted minute per ticket, and a GBP18 fully loaded hourly cost. They are not presented as observed savings.
+## Methodology
 
-## Project Progress
+1. Cleaned the Kaggle source data, removed duplicates, and filtered to English tickets.
+2. Performed EDA on ticket category, department, and priority distributions.
+3. Drew a stratified 500-ticket sample; 300 successful Gemini API classifications were available for validation.
+4. Constrained Gemini category, priority, and department predictions to the observed operating taxonomy.
+5. Calculated accuracy, precision, recall, F1, confusion matrices, and category-level empirical accuracy.
+6. Designed routing policy from empirical accuracy, not self-reported LLM confidence.
+7. Extracted root-cause wording, grouped it into transparent issue themes, and limited recommendations to observed sample shares.
 
-| Phase | Workstream | Status | Evidence |
-| --- | --- | --- | --- |
-| Phase 1 | Data cleaning and English-only scope | Complete | 28,587 source rows to 16,338 cleaned English tickets; cleaning audit saved locally. |
-| Phase 1 | EDA and distribution analysis | Complete | Executed Jupyter notebook and Power BI-ready category, department, and priority tables. |
-| Phase 1 | Operational-efficiency simulation | Complete | Assumption-labelled time and cost scenarios across all cleaned tickets. |
-| Phase 1 | Gemini classification and validation | Complete | 300 successful Free Tier predictions validated against known labels: category accuracy 63.3%, priority accuracy 38.0%, department accuracy 27.7%. |
-| Phase 2 | Routing design and threshold comparison | Complete | Category-only routing policy uses empirical accuracy. At a conservative 60% threshold, Request is eligible for auto-routing; all other categories remain in human review. |
-| Phase 3 | Root-cause analysis and recommendations | Initial extraction complete | Raw root causes are grouped into transparent issue themes. Recommendation shares are limited to observed classified-sample shares; ticket-level review is the next validation step. |
+## Data and Scope
 
-## Phase 2: AI Routing Design
+- **Dataset:** [Multilingual Customer Support Tickets](https://www.kaggle.com/datasets/tobiasbueck/multilingual-customer-support-tickets)
+- **Data type:** synthetic but realistic customer-support tickets used for demonstration purposes
+- **Source rows:** 28,587
+- **Cleaned English tickets:** 16,338
+- **Validated AI sample:** 300 successful classifications from a 500-ticket stratified sample
+- **AI provider:** Gemini API, using the Free Tier only
 
-The routing design uses empirical accuracy, not raw LLM confidence, as the primary decision basis.
+The methodology and metrics are transferable to real production ticket data, but the numerical results in this repository should not be interpreted as production performance.
 
-- High-accuracy categories can be recommended for auto-routing
-- Lower-accuracy or ambiguous categories remain in human review
-- LLM self-reported confidence is retained only as a supporting diagnostic field
+## Repository Guide
 
-This avoids overstating the reliability of model-generated confidence scores.
+| Location | Contents |
+| --- | --- |
+| `notebooks/` | Reproducible EDA and validation notebooks. |
+| `src/` | Cleaning, Gemini classification, validation, routing, and export modules. |
+| `sql/` | Optional EDA validation queries. |
+| `dashboard/powerbi/` | Final dashboard screenshots, DAX measures, and Power BI build guides. |
+| `reports/` | Methodology and root-cause mapping audit. |
 
-## Phase 3: Root Cause and Recommendations
+For Power BI implementation detail, see the [dashboard build guide](dashboard/powerbi/README.md) and the [Korean step-by-step guide](dashboard/powerbi/POWER_BI_STEP_BY_STEP_KO.md).
 
-Recurring issue analysis is based on extracted root causes, then grouped using transparent keyword rules to avoid treating wording variants as separate operational issues.
+## Reproduce Locally
 
-Recommendation principle:
-
-> If an issue accounts for X% of measured tickets, then self-service or FAQ improvements can be discussed as addressing up to that measured X% of ticket demand, before applying any separate adoption or deflection assumptions.
-
-All recommendation figures should be tied back to observed data.
-
-## How To Run
-
-1. Add the Kaggle CSV file to `data/raw/`.
-2. Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-3. Optional: download the Kaggle dataset with `kagglehub`:
-
-```bash
-python -m src.download_data
-```
-
-4. Clean and sample the data:
+1. Place the Kaggle CSV in `data/raw/`.
+2. Install dependencies with `pip install -r requirements.txt`.
+3. Clean and sample the dataset:
 
 ```bash
 python -m src.run_pipeline --raw-file data/raw/your_file.csv --sample-size 500
 ```
 
-5. Run Gemini classification using a Free Tier API key:
-
-Confirm in Google AI Studio that the API key belongs to a project marked **Free**. Do not link a billing account or select a paid-tier project for this portfolio project. The classifier accepts only `gemini-3.1-flash-lite`, requires an explicit free-tier acknowledgement, and caps each run at 500 tickets. It does not use grounding, batch processing, or other paid-only features. Predictions are saved after each ticket so an interrupted run can resume without repeating already completed requests. If the Free Tier quota is exhausted, failed tickets are retried only when the free quota becomes available again; the project never switches to a paid tier.
-
-```bash
-set GEMINI_API_KEY=your_free_tier_api_key
-set GEMINI_FREE_TIER_ONLY=true
-python -m src.gemini_classification --input data/processed/classification_sample.csv
-```
-
-In PowerShell, use:
-
-```powershell
-$env:GEMINI_API_KEY="your_free_tier_api_key"
-$env:GEMINI_FREE_TIER_ONLY="true"
-python -m src.gemini_classification --input data/processed/classification_sample.csv
-```
-
-6. Evaluate predictions and export Power BI tables:
+4. Set `GEMINI_API_KEY` and `GEMINI_FREE_TIER_ONLY=true` in a local `.env` file. Do not commit the file.
+5. Run the classifier and then regenerate metrics and dashboard tables:
 
 ```bash
+python -m src.gemini_classification --input data/processed/classification_sample.csv
 python -m src.run_pipeline --evaluate-only
 ```
 
-## Planned Power BI Outputs
+## Status
 
-- Ticket volume by category, priority, and department
-- Classification accuracy by label type
-- Confusion matrix heatmaps
-- Automation threshold scenario table
-- Estimated triage time saved
-- Top recurring root causes
+| Phase | Status | Outcome |
+| --- | --- | --- |
+| Phase 1: Core Analytics | Complete | Cleaning, EDA, validation metrics, confusion matrices, and assumption-based efficiency scenarios. |
+| Phase 2: AI Routing Design | Complete | Empirical-accuracy routing policy and threshold trade-off analysis. |
+| Phase 3: Root Cause and Recommendations | Complete with caveat | Named-theme recommendations plus visible 30.3% unmapped-wording quality guardrail. |
 
-## Methodology Notes
+## Important Limitations
 
-- Gemini classification is validated on a representative sample, not the full dataset.
-- Gemini is given the observed category, priority, and routing label options, then must choose from those options exactly. This tests AI-assisted triage within the existing operating taxonomy rather than an unrelated open-ended taxonomy.
-- LLM confidence is treated as an auxiliary signal only.
-- Routing thresholds are based on empirical performance against known labels.
-- Cost and time savings are simulation estimates and should be shown separately from directly observed data.
-- Gemini classification is restricted to the Google AI Studio Free Tier. The project is intentionally designed to stop at the free quota rather than continue on a paid tier.
-- The current validated Free Tier sample contains 300 successful classifications. Category predictions are materially stronger than priority and department predictions, so the operational policy permits only category-level auto-routing and retains priority and department review with a human.
+- LLM confidence is supplementary only; it does not determine routing decisions.
+- Savings are assumption-based scenarios, not measured production outcomes.
+- Root-cause themes are exploratory groupings of LLM-extracted wording, not independently verified production root causes.
+- Raw data, generated output tables, `.env`, and `.pbix` files are intentionally excluded from GitHub.
